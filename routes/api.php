@@ -11,7 +11,7 @@ use App\Http\Controllers\Auth\LogoutController;
 Route::group(['middleware' => ['auth:sanctum']], function ($route) {
 
     # to authenticate user by token
-    $route->get('/use', [LoginController::class, 'user']);
+    $route->get('/user', [LoginController::class, 'user']);
 
     # logout functionality
     $route->post('/logout', [LogoutController::class, 'logout']);
