@@ -6,11 +6,17 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/**
+ * @property mixed content
+ * @property mixed product_id
+ * @property mixed user_id
+ * @property mixed user
+ */
 class Review extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['content', 'product_id'];
+    protected $fillable = ['content', 'product_id', 'user_id'];
 
     /***
      * This function returns the product which the review belongs To

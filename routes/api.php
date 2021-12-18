@@ -1,6 +1,5 @@
 <?php
 
-
 use App\Http\Controllers\Auth\RegistrationController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ProductController;
@@ -23,28 +22,28 @@ Route::group(['middleware' => ['auth:sanctum']], function ($route) {
     # RestFull API for product
     Route::prefix('products')->group(function () {
         Route::get('/', [ProductController::class, 'index']);
-        Route::get('/{id}', [ProductController::class, 'show']);
+        Route::get('/{product}', [ProductController::class, 'show']);
         Route::post('/', [ProductController::class, 'store']);
-        Route::put('/{id}', [ProductController::class, 'update']);
-        Route::delete('/{id}', [ProductController::class, 'destroy']);
+        Route::put('/{product}', [ProductController::class, 'update']);
+        Route::delete('/{product}', [ProductController::class, 'destroy']);
     });
 
     # RestFull API for category
     Route::prefix('categories')->group(function () {
         Route::get('/', [CategoryController::class, 'index']);
-        Route::get('/{id}', [CategoryController::class, 'show']);
+        Route::get('/{category}', [CategoryController::class, 'show']);
         Route::post('/', [CategoryController::class, 'store']);
-        Route::put('/{id}', [CategoryController::class, 'update']);
-        Route::delete('/{id}', [CategoryController::class, 'destroy']);
+        Route::put('/{category}', [CategoryController::class, 'update']);
+        Route::delete('/{category}', [CategoryController::class, 'destroy']);
     });
 
     # RestFull API for review
     Route::prefix('reviews')->group(function () {
         Route::get('/', [ReviewController::class, 'index']);
-        Route::get('/{id}', [ReviewController::class, 'show']);
+        Route::get('/{review}', [ReviewController::class, 'show']);
         Route::post('/', [ReviewController::class, 'store']);
-        Route::put('/{id}', [ReviewController::class, 'update']);
-        Route::delete('/{id}', [ReviewController::class, 'destroy']);
+        Route::put('/{review}', [ReviewController::class, 'update']);
+        Route::delete('/{review}', [ReviewController::class, 'destroy']);
     });
 
 });

@@ -13,9 +13,11 @@ class CategoryController extends Controller
      *
      * @return Response
      */
-    public function index()
+    public function index(): Response
     {
-        //
+        return response([
+            'data' => Category::all()
+        ]);
     }
 
     /**
@@ -24,9 +26,19 @@ class CategoryController extends Controller
      * @param Request $request
      * @return Response
      */
-    public function store(Request $request)
+    public function store(Request $request): Response
     {
-        //
+        $request->validate([
+            'name' => 'required'
+        ]);
+
+        $created = Category::query()->create([
+            'name' => $request->get('name')
+        ]);
+
+        return response([
+            'data' => $created
+        ]);
     }
 
     /**
@@ -35,9 +47,11 @@ class CategoryController extends Controller
      * @param Category $category
      * @return Response
      */
-    public function show(Category $category)
+    public function show(Category $category): Response
     {
-        //
+        return response([
+            'data' => $category
+        ]);
     }
 
     /**
@@ -47,9 +61,19 @@ class CategoryController extends Controller
      * @param Category $category
      * @return Response
      */
-    public function update(Request $request, Category $category)
+    public function update(Request $request, Category $category): Response
     {
-        //
+         $request->validate([
+            'name' => 'required'
+        ]);
+
+        $updated = $category->update([
+            'name' => $request->input('name')
+        ]);
+
+        return response([
+            'data' => $updated
+        ]);
     }
 
     /**
@@ -58,8 +82,10 @@ class CategoryController extends Controller
      * @param Category $category
      * @return Response
      */
-    public function destroy(Category $category)
+    public function destroy(Category $category): Response
     {
-        //
+        return response([
+            'message' => $category->delete() . ' category deleted'
+        ]);
     }
 }

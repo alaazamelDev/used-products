@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Review;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Auth;
 
 class ReviewController extends Controller
 {
@@ -13,10 +14,12 @@ class ReviewController extends Controller
      *
      * @return Response
      */
-    public function index()
+    public function index(): Response
     {
-        //
-        dd('hello from index in reviews');
+        return response([
+            'data' => Review::all(),
+            'message' => 'data retrieved successfully'
+        ]);
     }
 
     /**
@@ -25,9 +28,20 @@ class ReviewController extends Controller
      * @param Request $request
      * @return Response
      */
-    public function store(Request $request)
+    public function store(Request $request): Response
     {
-        //
+        $request->validate([
+            'content' => 'required|max:100',
+            'user_id' => 'required',
+            'product_id' => 'required',
+        ]);
+
+        $review = Review::query()->create([
+            'content' => $request->get('content'),
+            'user_id' => $request->get('user_id'),
+            'product_id' => $request->get('product_id'),
+        ]);
+        return response($review);
     }
 
     /**
@@ -36,9 +50,11 @@ class ReviewController extends Controller
      * @param Review $review
      * @return Response
      */
-    public function show(Review $review)
+    public function show(Review $review): Response
     {
-        //
+        return response([
+            'data' => $review
+        ]);
     }
 
     /**
@@ -48,9 +64,25 @@ class ReviewController extends Controller
      * @param Review $review
      * @return Response
      */
-    public function update(Request $request, Review $review)
+    public function update(Request $request, Review $review): Response
     {
-        //
+        // check if user is the owner of this product
+        if ($request->user()->id != $review->user->id)
+            return response([
+                'message' => 'you can\'t update a review you don\'t own'
+            ], 401);
+
+        $content = $request->input('content');
+        if ($content) {
+            $review->content = $content;
+        }
+
+        // save the new version
+        $updated = $review->push();
+
+        return response([
+            'message' => $updated ? ' review updated successfully' : 'validate your data'
+        ]);
     }
 
     /**
@@ -59,8 +91,16 @@ class ReviewController extends Controller
      * @param Review $review
      * @return Response
      */
-    public function destroy(Review $review)
+    public function destroy(Review $review): Response
     {
-        //
+        // check if user is the owner of this product
+        if (Auth::id() != $review->user->id)
+            return response([
+                'message' => 'you can\'t delete a review you don\'t own'
+            ], 401);
+
+        return response([
+            'message' => $review->delete() . ' review deleted'
+        ]);
     }
 }

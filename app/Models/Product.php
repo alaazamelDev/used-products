@@ -7,6 +7,19 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+/**
+ * @property mixed name
+ * @property mixed image_url
+ * @property mixed exp_date
+ * @property mixed description
+ * @property mixed views
+ * @property mixed phone_number
+ * @property mixed quantity
+ * @property mixed price
+ * @property mixed category_id
+ * @property mixed user_id
+ * @property mixed user
+ */
 class Product extends Model
 {
     use HasFactory;
@@ -35,7 +48,7 @@ class Product extends Model
     /**
      * Returns user which owns this product
      **/
-    public function owner(): BelongsTo
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
