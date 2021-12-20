@@ -28,6 +28,13 @@ class ProductController extends Controller
         $start_price = request('start_price');
         $end_price = request('end_price');
 
+        // query parameters for products with expiry date range
+        $start_date = request('start_date');
+        $end_date = request('end_date');
+
+        // get sort_by field, to sort the response according to it
+        $sort_by = request('sort_by');
+
         // build query to fetch the required data
         $productQueryBuilder = Product::query();
 
@@ -44,6 +51,14 @@ class ProductController extends Controller
         // search by expiry date
         if ($exp_date) {
             $productQueryBuilder->where('exp_date', 'LIKE', '%' . $exp_date . '%');
+        }
+
+        if ($start_date) {
+            $productQueryBuilder->where('exp_date', '>=', $start_date);
+        }
+
+        if ($end_date) {
+            $productQueryBuilder->where('exp_date', '<=', $end_date);
         }
 
         // filter products by price range
@@ -64,10 +79,16 @@ class ProductController extends Controller
             $productQueryBuilder->where('user_id', '=', $user_id);
         }
 
+        // if sort_by field is exist, sort the response according to it
+        if ($sort_by) {
+            $productQueryBuilder->orderBy($sort_by);
+        }
+
         return response([
             'data' => $productQueryBuilder->get()
         ]);
     }
+
 
     /**
      * Store a newly created resource in storage.
@@ -85,6 +106,7 @@ class ProductController extends Controller
             'phone_number' => 'required',
             'quantity' => 'nullable',
             'price' => 'required',
+            'discount_list' => 'required',
             'category_id' => 'required',
         ]);
 
@@ -101,6 +123,20 @@ class ProductController extends Controller
             'user_id' => $request->user()->id,
         ]);
 
+        // store discounts
+        $discount_list = $request->get('discount_list');
+        foreach ($discount_list as $discount) {
+            $product->discounts->create([
+                'date' => $discount['date'],
+                'discount_percentage' => ['discount_percentage'],
+                'product_id' => $product->id,
+            ]);
+        }
+
+        // save editing
+        $product->save();
+
+
         // Returns the created product object
         return response($product);
     }
@@ -114,9 +150,7 @@ class ProductController extends Controller
      */
     public function show(Product $product): Response
     {
-        return response([
-            'data' => $product
-        ]);
+        return response($product);
     }
 
     /**
@@ -190,6 +224,7 @@ class ProductController extends Controller
             'message' => $updated ? 'updated successfully' : 'validate your data'
         ]);
     }
+
 
     /**
      * Remove the specified resource from storage.

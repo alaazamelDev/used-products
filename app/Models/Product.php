@@ -28,6 +28,10 @@ class Product extends Model
         'description', 'views', 'phone_number', 'quantity',
         'price', 'category_id', 'user_id'];
 
+    protected $appends = ['new_price'];
+
+    protected $with = ['reviews'];
+    protected $withCount = ['reviews'];
 
     /**
      * Returns category which this product belongs To
@@ -51,5 +55,23 @@ class Product extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function discounts(): HasMany
+    {
+        return $this->hasMany(Discount::class)->orderBy('date');
+    }
+
+    public function getNewPriceAttribute()
+    {
+        $newPrice = $this->price;
+        $discounts = $this->discounts(); // list of discounts
+        foreach ($discounts as $discount) {
+            if (now() >= $discount['date']) {
+                // we entered the range of this discount, so we apply the appropriate discount
+                $newPrice = $this->price - ($this->price * $discount['discount_percentage']) / 100;
+            }
+        }
+        return $newPrice;
     }
 }

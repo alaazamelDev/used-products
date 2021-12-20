@@ -20,6 +20,7 @@ class CreateProductsTable extends Migration
             $table->timestamp('exp_date');
             $table->string('phone_number');
             $table->string('description');
+            $table->integer('views')->unsigned()->default(0);
             $table->integer('quantity')->default(1)->unsigned();
             $table->double('price')->unsigned();
             $table->integer('category_id')->unsigned();

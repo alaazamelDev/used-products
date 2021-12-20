@@ -4,12 +4,13 @@ use App\Http\Controllers\Auth\RegistrationController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\UploadController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\LogoutController;
 
 
-# this is used to return user related to the token included in the header
+// These routes must pass authentication middleware before accessing the controllers
 Route::group(['middleware' => ['auth:sanctum']], function ($route) {
 
     # to authenticate user by token
@@ -26,6 +27,9 @@ Route::group(['middleware' => ['auth:sanctum']], function ($route) {
         Route::post('/', [ProductController::class, 'store']);
         Route::put('/{product}', [ProductController::class, 'update']);
         Route::delete('/{product}', [ProductController::class, 'destroy']);
+
+        // image upload route
+        Route::post('/image', [UploadController::class, 'upload']);
     });
 
     # RestFull API for category
