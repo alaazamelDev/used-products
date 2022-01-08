@@ -27,18 +27,11 @@ Route::group(['middleware' => ['auth:sanctum']], function ($route) {
         Route::post('/', [ProductController::class, 'store']);
         Route::put('/{product}', [ProductController::class, 'update']);
         Route::delete('/{product}', [ProductController::class, 'destroy']);
+        Route::put('/{product}/views', [ProductController::class, 'increaseViews']);
 
-        // image upload route
-        Route::post('/image', [UploadController::class, 'upload']);
-    });
-
-    # RestFull API for category
-    Route::prefix('categories')->group(function () {
-        Route::get('/', [CategoryController::class, 'index']);
-        Route::get('/{category}', [CategoryController::class, 'show']);
-        Route::post('/', [CategoryController::class, 'store']);
-        Route::put('/{category}', [CategoryController::class, 'update']);
-        Route::delete('/{category}', [CategoryController::class, 'destroy']);
+        # Implement Like functionality
+        Route::get('/{product}/like', [ProductController::class, 'isLikedByMe']);   // isLiked by me, boolean response
+        Route::post('/{product}/like', [ProductController::class, 'like']); // add like
     });
 
     # RestFull API for review
@@ -51,6 +44,19 @@ Route::group(['middleware' => ['auth:sanctum']], function ($route) {
     });
 
 });
+
+// image upload route
+Route::post('/image', [UploadController::class, 'upload']);
+
+# RestFull API for category
+Route::prefix('categories')->group(function () {
+    Route::get('/', [CategoryController::class, 'index']);
+    Route::get('/{category}', [CategoryController::class, 'show']);
+    Route::post('/', [CategoryController::class, 'store']);
+    Route::put('/{category}', [CategoryController::class, 'update']);
+    Route::delete('/{category}', [CategoryController::class, 'destroy']);
+});
+
 
 # an Endpoint to login to the system
 Route::post('/login', [LoginController::class, 'login']);

@@ -2,8 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Discount;
+use App\Models\Like;
 use App\Models\Product;
-use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
@@ -17,6 +18,10 @@ class ProductController extends Controller
      */
     public function index(): Response
     {
+
+        // this parameter represent the search query
+        $query = request('query');
+
         // collect inputs
         $name = request('name');
         $price = request('price');
@@ -84,6 +89,14 @@ class ProductController extends Controller
             $productQueryBuilder->orderBy($sort_by);
         }
 
+        // search in name and category and exp-date
+        if ($query) {
+            $productQueryBuilder
+                ->where('name', 'LIKE', '%' . $query . '%')
+                ->orWhere('exp_date', 'LIKE', '%' . $query . '%')
+                ->orWhere('category', 'LIKE', '%' . $query . '%');
+        }
+
         return response([
             'data' => $productQueryBuilder->get()
         ]);
@@ -114,7 +127,7 @@ class ProductController extends Controller
         $product = Product::query()->create([
             'name' => $request->get('name'),
             'image_url' => $request->get('image_url'),
-            'exp_date' => Carbon::parse($request->get('exp_date'))->format('Y-m-d H:i:s'),
+            'exp_date' => $request->get('exp_date'),
             'phone_number' => $request->get('phone_number'),
             'description' => $request->get('description'),
             'quantity' => $request->get('quantity'),
@@ -124,11 +137,11 @@ class ProductController extends Controller
         ]);
 
         // store discounts
-        $discount_list = $request->get('discount_list');
+        $discount_list = json_decode($request->get('discount_list'));
         foreach ($discount_list as $discount) {
-            $product->discounts->create([
-                'date' => $discount['date'],
-                'discount_percentage' => ['discount_percentage'],
+            Discount::query()->create([
+                'date' => $discount->date,
+                'discount_percentage' => $discount->discount_percentage,
                 'product_id' => $product->id,
             ]);
         }
@@ -219,7 +232,7 @@ class ProductController extends Controller
         }
 
         // save the new version of product
-        $updated = $product->push();
+        $updated = $product->save();
         return response([
             'message' => $updated ? 'updated successfully' : 'validate your data'
         ]);
@@ -242,6 +255,52 @@ class ProductController extends Controller
 
         return response([
             'message' => $product->delete() . ' product deleted'
+        ]);
+    }
+
+    public function isLikedByMe(Product $product): Response
+    {
+        if (Like::query()
+            ->where('user_id', '=', Auth::id())
+            ->where('product_id', '=', $product->id)
+            ->exists()) {
+            return response([
+                'isLiked' => true
+            ]);
+        }
+        return response([
+            'isLiked' => false
+        ]);
+    }
+
+    public function like(Product $product)
+    {
+        // to know whether there is an like already or not
+        $existing_like = Like::withTrashed()
+            ->where('product_id', '=', $product->id)
+            ->where('user_id', '=', Auth::id())
+            ->first();
+
+        if (is_null($existing_like)) {
+            Like::query()->create([
+                'product_id' => $product->id,
+                'user_id' => Auth::id()
+            ]);
+        } else {
+            if (is_null($existing_like->deleted_at)) {
+                $existing_like->delete();
+            } else {
+                $existing_like->restore();
+            }
+        }
+    }
+
+    public function increaseViews(Product $product)
+    {
+        $product->views += 1;
+        $product->save();
+        return response([
+            'message' => 'increased'
         ]);
     }
 }

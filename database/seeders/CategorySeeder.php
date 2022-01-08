@@ -16,7 +16,7 @@ class CategorySeeder extends Seeder
     {
         // Generate category dummy data
         Category::factory()
-            ->count(50)
+            ->count(10)
             ->create();
 
     }

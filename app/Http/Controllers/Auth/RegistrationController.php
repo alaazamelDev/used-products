@@ -18,7 +18,7 @@ class RegistrationController extends Controller
             'password' => 'required|min:6'
         ]);
 
-        $user = User::create([
+        $user = User::query()->create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => bcrypt($request->password),

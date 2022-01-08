@@ -2,7 +2,7 @@
 
 namespace Database\Factories;
 
-use Carbon\Carbon;
+
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class ProductFactory extends Factory
@@ -17,12 +17,12 @@ class ProductFactory extends Factory
         return [
             'name' => $this->faker->name(),
             'image_url' => $this->faker->url(),
-            'exp_date' => Carbon::parse($this->faker->date())->format('Y-m-d H:i:s'),
+            'exp_date' => $this->faker->date('Y-m-d H:i:s'),
             'description' => $this->faker->text(100),
             'phone_number' => $this->faker->phoneNumber(),
             'quantity' => $this->faker->randomNumber(3),
             'price' => $this->faker->randomFloat(2,),
-            'category_id' => rand(1, 50),
+            'category_id' => rand(1, 10),
             'user_id' => rand(1, 50),
         ];
     }

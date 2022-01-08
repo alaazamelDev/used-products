@@ -18,6 +18,7 @@ class Review extends Model
 
     protected $fillable = ['content', 'product_id', 'user_id'];
 
+    protected $with = ['user'];
 
     /***
      * This function returns the product which the review belongs To

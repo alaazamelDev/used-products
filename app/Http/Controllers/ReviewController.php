@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Product;
 use App\Models\Review;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -29,17 +28,16 @@ class ReviewController extends Controller
      * @param Request $request
      * @return Response
      */
-    public function store(Request $request,Product $product): Response
+    public function store(Request $request): Response
     {
         $request->validate([
             'content' => 'required|max:100',
-            'user_id' => 'required',
-            'product_id' => 'required',
         ]);
 
-        $review = $product->reviews->create([
+        $review = Review::query()->create([
             'content' => $request->get('content'),
-            'user_id' => $request->get('user_id'),
+            'product_id' => $request->get('product_id'),
+            'user_id' => Auth::id(),
         ]);
         return response($review);
     }
